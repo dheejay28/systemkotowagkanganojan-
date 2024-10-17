@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserve Room</title>
     <link rel="stylesheet" href="rsv.css">
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -36,9 +36,11 @@
     </div>
 
     <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby2m7gztzQEymMpbhBRlpC_MN1S9uk5Casf3QGyDTSQhxbviwec63enPcngitHmvAyOgQ/exec';
+
         // Load available rooms from Google Sheets
         function loadRooms() {
-            google.script.run.withSuccessHandler(function(rooms) {
+            $.getJSON(scriptURL + '?action=getRooms', function(rooms) {
                 const roomSelect = document.getElementById('room-name');
                 roomSelect.innerHTML = ''; // Clear any existing options
 
@@ -48,7 +50,7 @@
                     option.textContent = room; // Display text for the option
                     roomSelect.appendChild(option); // Add option to the select element
                 });
-            }).getRooms(); // Call Apps Script function
+            });
         }
 
         // Function to reserve a room
@@ -77,13 +79,15 @@
             };
 
             // Call Apps Script to reserve the room
-            google.script.run.withSuccessHandler(function(response) {
+            $.post(scriptURL + '?action=reserveRoom', JSON.stringify(reservationData), function(response) {
                 if (response.success) {
                     alert('Room reserved successfully! Your reservation code is: ' + response.reservationCode);
                 } else {
                     alert(response.message);
                 }
-            }).reserveRoom(reservationData); // Call reserveRoom function
+            }, 'json').fail(function() {
+                alert("Error reserving the room. Please try again.");
+            });
         }
 
         // Load rooms and current date/time when the page loads
