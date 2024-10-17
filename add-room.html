@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Room</title>
-    <link rel="stylesheet" href="addingroom.css">
+    <link rel="stylesheet" href="add-room.css"> <!-- Link to your CSS -->
 </head>
 <body>
     <div class="container">
         <img src="logo.png" alt="Logo" class="logo">
         <h1>Add Room</h1>
-        
+
         <label for="room-name">Room Name:</label>
         <input type="text" id="room-name" required>
-        
+
         <button onclick="addRoom()">Add Room</button>
         <button onclick="window.location.href='index.html'">Back to Home</button>
 
@@ -25,45 +25,60 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="rooms-body">
+            <tbody id="rooms-tbody">
                 <!-- Added rooms will be populated here -->
             </tbody>
         </table>
     </div>
 
     <script>
-        // Function to add a room
+        // Load added rooms from local storage
+        function loadRooms() {
+            const rooms = JSON.parse(localStorage.getItem('addedRooms')) || [];
+            const tbody = document.getElementById('rooms-tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            rooms.forEach((room, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${room}</td>
+                    <td><button onclick="removeRoom(${index})">Remove</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Add a room to the local storage and update the table
         function addRoom() {
-            const roomName = document.getElementById('room-name').value.trim();
+            const roomNameInput = document.getElementById('room-name');
+            const roomName = roomNameInput.value.trim();
 
             if (!roomName) {
                 alert("Please enter a room name.");
-                return;
+                return; // Exit if the input is empty
             }
 
-            // Add room to the table
-            const tableBody = document.getElementById('rooms-body');
-            const newRow = document.createElement('tr');
+            // Get existing rooms from local storage
+            const rooms = JSON.parse(localStorage.getItem('addedRooms')) || [];
+            rooms.push(roomName); // Add new room
+            localStorage.setItem('addedRooms', JSON.stringify(rooms)); // Save back to local storage
 
-            newRow.innerHTML = `
-                <td>${roomName}</td>
-                <td><button onclick="removeRoom(this)">Remove</button></td>
-            `;
-
-            tableBody.appendChild(newRow);
-
-            // Optionally, clear the input
-            document.getElementById('room-name').value = '';
-
-            // Here you can also add a call to your Apps Script function to save the room to your Google Sheet
+            roomNameInput.value = ''; // Clear input field
+            loadRooms(); // Reload rooms in table
         }
 
-        // Function to remove a room
-        function removeRoom(button) {
-            const row = button.parentNode.parentNode; // Get the row of the button
-            row.parentNode.removeChild(row); // Remove the row from the table
-            // You can add a call here to your Apps Script function to remove the room from the Google Sheet
+        // Remove a room from local storage and update the table
+        function removeRoom(index) {
+            const rooms = JSON.parse(localStorage.getItem('addedRooms')) || [];
+            rooms.splice(index, 1); // Remove the room at the specified index
+            localStorage.setItem('addedRooms', JSON.stringify(rooms)); // Save back to local storage
+            loadRooms(); // Reload rooms in table
         }
+
+        // Load rooms on page load
+        window.onload = function() {
+            loadRooms(); // Load rooms from local storage
+        };
     </script>
 </body>
 </html>
