@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styless.css"> <!-- Updated CSS file name -->
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Login</h1>
+
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Log In</button>
+            <button type="button" onclick="window.location.href='index.html'">Home</button>
+        </form>
+
+        <div id="error-message" style="color: red;"></div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Replace these with your actual admin credentials
+            const adminUsername = 'iamtheadmin'; 
+            const adminPassword = 'Dj*0100010001001010';
+
+            if (username === adminUsername && password === adminPassword) {
+                // Redirect to admin page if login is successful
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('error-message').textContent = 'Invalid username or password.';
+            }
+        });
+    </script>
+</body>
+</html>

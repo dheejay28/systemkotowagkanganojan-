@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Reservation System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Welcome to Room Reservation System</h1>
+        <div id="datetime" class="datetime"></div> <!-- Date and Time Display -->
+        
+        <button onclick="window.location.href='reserve.html'">Reserve Room</button>
+        <button onclick="window.location.href='return.html'">Return Room</button>
+        <button onclick="window.location.href='reserved-rooms.html'">View Reserved Rooms</button>
+        <button onclick="window.location.href='login.html'">Log In</button>
+    </div>
+
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            document.getElementById('datetime').textContent = now.toLocaleString('en-US', options);
+        }
+
+        // Load the date and time when the page is ready
+        window.onload = function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update every second
+        };
+    </script>
+</body>
+</html>
