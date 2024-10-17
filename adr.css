@@ -1,8 +1,6 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
 }
 
 .container {
@@ -30,19 +28,10 @@ h1 {
     color: #666;
 }
 
-/* Wrap the table in a container and allow horizontal scrolling */
-.table-container {
-    margin-top: 20px;
-    overflow-x: auto; /* Enables horizontal scrolling */
-    overflow-y: hidden; /* Prevents vertical scrolling */
-    white-space: nowrap; /* Prevents wrapping of table columns */
-    max-width: 100%; /* Makes the table container responsive */
-}
-
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px; /* Ensures the table doesn't shrink too much */
+    margin-top: 20px;
 }
 
 th, td {
@@ -66,7 +55,6 @@ button {
     border: none;
     padding: 8px 12px;
     cursor: pointer;
-    margin-top: 20px;
 }
 
 button:hover {
