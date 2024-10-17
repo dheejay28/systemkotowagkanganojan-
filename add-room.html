@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Room</title>
-    <link rel="stylesheet" href="addingroom.css">
+    <link rel="stylesheet" href="rsv.css">
 </head>
 <body>
     <div class="container">
@@ -15,56 +15,55 @@
         <input type="text" id="room-name" required>
         
         <button onclick="addRoom()">Add Room</button>
-        <button onclick="window.location.href='admin.html'">Back to Admin</button>
+        <button onclick="window.location.href='index.html'">Back to Home</button>
 
         <h2>Added Rooms</h2>
-        <table id="room-table">
+        <table id="rooms-table">
             <thead>
                 <tr>
                     <th>Room Name</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="room-list"></tbody>
+            <tbody id="rooms-body">
+                <!-- Added rooms will be populated here -->
+            </tbody>
         </table>
     </div>
 
     <script>
-        // Function to load rooms from local storage and display them in the table
-        function loadRooms() {
-            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
-            const roomList = document.getElementById('room-list');
-            roomList.innerHTML = ''; // Clear any existing rows
-
-            rooms.forEach(room => {
-                const row = document.createElement('tr');
-                const cell = document.createElement('td');
-                cell.textContent = room; // Display room name in the cell
-                row.appendChild(cell); // Add cell to row
-                roomList.appendChild(row); // Add row to table body
-            });
-        }
-
         // Function to add a room
         function addRoom() {
             const roomName = document.getElementById('room-name').value.trim();
+
             if (!roomName) {
                 alert("Please enter a room name.");
-                return; // Exit the function if the field is empty
+                return;
             }
 
-            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
-            rooms.push(roomName); // Add new room to the array
-            localStorage.setItem('rooms', JSON.stringify(rooms)); // Save updated room list to local storage
+            // Add room to the table
+            const tableBody = document.getElementById('rooms-body');
+            const newRow = document.createElement('tr');
 
-            alert('Room added successfully!');
-            loadRooms(); // Reload rooms to display the updated list
-            document.getElementById('room-name').value = ''; // Clear the input field
+            newRow.innerHTML = `
+                <td>${roomName}</td>
+                <td><button onclick="removeRoom(this)">Remove</button></td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Optionally, clear the input
+            document.getElementById('room-name').value = '';
+
+            // Here you can also add a call to your Apps Script function to save the room to your Google Sheet
         }
 
-        // Load rooms when the page loads
-        window.onload = function() {
-            loadRooms(); // Load rooms from local storage
-        };
+        // Function to remove a room
+        function removeRoom(button) {
+            const row = button.parentNode.parentNode; // Get the row of the button
+            row.parentNode.removeChild(row); // Remove the row from the table
+            // You can add a call here to your Apps Script function to remove the room from the Google Sheet
+        }
     </script>
 </body>
 </html>
