@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserve Room</title>
-    <link rel="stylesheet" href="rsv.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="rsv.css"> <!-- Link to your CSS -->
 </head>
 <body>
     <div class="container">
@@ -36,20 +35,17 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycby2m7gztzQEymMpbhBRlpC_MN1S9uk5Casf3QGyDTSQhxbviwec63enPcngitHmvAyOgQ/exec';
-
-        // Load available rooms from Google Sheets
+        // Load available rooms from local storage
         function loadRooms() {
-            $.getJSON(scriptURL + '?action=getRooms', function(rooms) {
-                const roomSelect = document.getElementById('room-name');
-                roomSelect.innerHTML = ''; // Clear any existing options
+            const rooms = JSON.parse(localStorage.getItem('addedRooms')) || [];
+            const roomSelect = document.getElementById('room-name');
+            roomSelect.innerHTML = ''; // Clear any existing options
 
-                rooms.forEach(room => {
-                    const option = document.createElement('option');
-                    option.value = room; // Value for the selected option
-                    option.textContent = room; // Display text for the option
-                    roomSelect.appendChild(option); // Add option to the select element
-                });
+            rooms.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room; // Value for the selected option
+                option.textContent = room; // Display text for the option
+                roomSelect.appendChild(option); // Add option to the select element
             });
         }
 
@@ -78,21 +74,19 @@
                 endTime
             };
 
-            // Call Apps Script to reserve the room
-            $.post(scriptURL + '?action=reserveRoom', JSON.stringify(reservationData), function(response) {
+            // Call Apps Script to reserve the room (you should have this function in your script)
+            google.script.run.withSuccessHandler(function(response) {
                 if (response.success) {
                     alert('Room reserved successfully! Your reservation code is: ' + response.reservationCode);
                 } else {
                     alert(response.message);
                 }
-            }, 'json').fail(function() {
-                alert("Error reserving the room. Please try again.");
-            });
+            }).reserveRoom(reservationData); // Call reserveRoom function
         }
 
         // Load rooms and current date/time when the page loads
         window.onload = function() {
-            loadRooms(); // Load rooms from the database
+            loadRooms(); // Load rooms from local storage
             const now = new Date();
             document.getElementById('datetime').textContent = `Current Time: ${now.toLocaleString()}`;
         };
