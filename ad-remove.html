@@ -5,10 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Remove Reserved Rooms</title>
     <link rel="stylesheet" href="adr.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 150px; /* Adjust size as needed */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .datetime {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <img src="logo.png" alt="Logo" class="logo" style="width: 150px; height: auto;">
+        <img src="logo.png" alt="Logo" class="logo">
         <h1>Admin: Remove Reserved Rooms</h1>
         <div class="datetime" id="datetime"></div>
 
@@ -31,6 +102,14 @@
     </div>
 
     <script>
+        // Function to format time in 12-hour format
+        function formatTimeTo12Hour(timeString) {
+            const [hour, minute] = timeString.split(':').map(Number);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const formattedHour = hour % 12 || 12; // Convert to 12-hour format
+            return `${formattedHour}:${minute < 10 ? '0' + minute : minute} ${period}`;
+        }
+
         function loadReservedRooms() {
             const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
             const reservedRoomsList = document.getElementById('reserved-rooms-list');
@@ -43,8 +122,8 @@
                     <td>${reservation.username}</td>
                     <td>${reservation.course || 'N/A'}</td>
                     <td>${reservation.yearSection || 'N/A'}</td>
-                    <td>${reservation.startTime}</td>
-                    <td>${reservation.endTime}</td>
+                    <td>${formatTimeTo12Hour(reservation.startTime)}</td>
+                    <td>${formatTimeTo12Hour(reservation.endTime)}</td>
                     <td><button onclick="removeRoom(${index})">Remove</button></td>
                 `;
                 reservedRoomsList.appendChild(row);
