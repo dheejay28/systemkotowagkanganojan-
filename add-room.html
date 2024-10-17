@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <img src="logo.png" alt="Logo" class="logo">
-        <h1>Add Room</h1>
+        <h1>Add a Room</h1>
 
         <label for="room-name">Room Name:</label>
         <input type="text" id="room-name" required>
@@ -18,7 +18,7 @@
         <button onclick="window.location.href='index.html'">Back to Home</button>
 
         <h2>Added Rooms</h2>
-        <table id="rooms-table" border="1">
+        <table id="rooms-table">
             <thead>
                 <tr>
                     <th>Room Name</th>
@@ -30,9 +30,21 @@
     </div>
 
     <script>
-        const scriptURL = "https://script.google.com/macros/s/AKfycby2m7gztzQEymMpbhBRlpC_MN1S9uk5Casf3QGyDTSQhxbviwec63enPcngitHmvAyOgQ/exec";
+        function loadRooms() {
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            const roomsBody = document.getElementById('rooms-body');
+            roomsBody.innerHTML = ''; // Clear existing rows
 
-        // Function to add a new room
+            rooms.forEach(room => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${room}</td>
+                    <td><button onclick="removeRoom('${room}')">Remove</button></td>
+                `;
+                roomsBody.appendChild(row);
+            });
+        }
+
         function addRoom() {
             const roomName = document.getElementById('room-name').value.trim();
             if (!roomName) {
@@ -40,49 +52,22 @@
                 return;
             }
 
-            // Call the Apps Script to add the room
-            google.script.run.withSuccessHandler(function(response) {
-                if (response.success) {
-                    alert('Room added successfully!');
-                    document.getElementById('room-name').value = ''; // Clear input
-                    loadRooms(); // Reload the table
-                } else {
-                    alert(response.message);
-                }
-            }).addRoom({ roomName: roomName }); // Call addRoom function
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            rooms.push(roomName);
+            localStorage.setItem('rooms', JSON.stringify(rooms));
+            alert('Room added successfully!');
+            document.getElementById('room-name').value = ''; // Clear input
+            loadRooms(); // Refresh the room list
         }
 
-        // Function to load added rooms into the table
-        function loadRooms() {
-            google.script.run.withSuccessHandler(function(rooms) {
-                const roomsBody = document.getElementById('rooms-body');
-                roomsBody.innerHTML = ''; // Clear previous entries
-
-                rooms.forEach(room => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${room}</td>
-                                     <td><button onclick="removeRoom('${room}')">Remove</button></td>`;
-                    roomsBody.appendChild(row); // Add row to the table
-                });
-            }).getRooms(); // Call Apps Script function
-        }
-
-        // Function to remove a room
         function removeRoom(roomName) {
-            google.script.run.withSuccessHandler(function(response) {
-                if (response.success) {
-                    alert('Room removed successfully!');
-                    loadRooms(); // Reload the rooms table
-                } else {
-                    alert(response.message);
-                }
-            }).removeRoom({ roomName: roomName }); // Call removeRoom function
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            const updatedRooms = rooms.filter(room => room !== roomName);
+            localStorage.setItem('rooms', JSON.stringify(updatedRooms));
+            loadRooms(); // Refresh the room list
         }
 
-        // Load rooms when the page loads
-        window.onload = function() {
-            loadRooms(); // Load rooms from the database
-        };
+        window.onload = loadRooms; // Load rooms on page load
     </script>
 </body>
 </html>
