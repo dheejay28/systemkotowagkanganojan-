@@ -28,10 +28,16 @@ h1 {
     color: #666;
 }
 
+/* Wrap the table in a container and allow horizontal scrolling */
+.table-container {
+    margin-top: 20px;
+    overflow-x: auto; /* Enables horizontal scrolling */
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    min-width: 600px; /* Ensures the table doesn't shrink too much */
 }
 
 th, td {
