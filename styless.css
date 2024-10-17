@@ -54,7 +54,7 @@ button {
     border-radius: 5px; /* Rounded corners */
     cursor: pointer; /* Pointer cursor on hover */
     font-size: 16px;
-    margin-top: 10px; /* Add space between the buttons */
+    margin-top: 15px; /* Add space between the buttons */
 }
 
 button:hover {
