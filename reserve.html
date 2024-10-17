@@ -74,14 +74,14 @@
                 endTime
             };
 
-            // Call Apps Script to reserve the room (you should have this function in your script)
+            // Call Google Apps Script to reserve the room
             google.script.run.withSuccessHandler(function(response) {
                 if (response.success) {
                     alert('Room reserved successfully! Your reservation code is: ' + response.reservationCode);
                 } else {
                     alert(response.message);
                 }
-            }).reserveRoom(reservationData); // Call reserveRoom function
+            }).reserveRoom(reservationData); // Call reserveRoom function in your Apps Script
         }
 
         // Load rooms and current date/time when the page loads
