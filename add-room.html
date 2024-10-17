@@ -3,95 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Add Room</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Add Room</title>
+    <link rel="stylesheet" href="addingroom.css">
 </head>
 <body>
     <div class="container">
         <img src="logo.png" alt="Logo" class="logo">
         <h1>Add Room</h1>
-        <div id="datetime" class="datetime"></div> <!-- Date and Time Display -->
+        
+        <label for="room-name">Room Name:</label>
+        <input type="text" id="room-name" required>
+        
+        <button onclick="addRoom()">Add Room</button>
+        <button onclick="window.location.href='admin.html'">Back to Admin</button>
 
-        <form id="add-room-form">
-            <label for="room-name">Room Name:</label>
-            <input type="text" id="room-name" required>
-            <button type="submit">Add Room</button>
-        </form>
-
-        <h2>Available Rooms</h2>
-        <ul id="room-list"></ul>
-
-        <div id="remove-room-controls" style="display: none;">
-            <h2>Remove Room</h2>
-            <button id="remove-room-btn">Remove Selected Room</button>
-        </div>
+        <h2>Added Rooms</h2>
+        <table id="room-table">
+            <thead>
+                <tr>
+                    <th>Room Name</th>
+                </tr>
+            </thead>
+            <tbody id="room-list"></tbody>
+        </table>
     </div>
 
     <script>
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: true 
-            };
-            document.getElementById('datetime').textContent = now.toLocaleString('en-US', options);
-        }
-
+        // Function to load rooms from local storage and display them in the table
         function loadRooms() {
             const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
             const roomList = document.getElementById('room-list');
+            roomList.innerHTML = ''; // Clear any existing rows
 
-            // Clear existing list
-            roomList.innerHTML = '';
-
-            // Add room items to the list
-            rooms.forEach((room) => {
-                const li = document.createElement('li');
-                li.textContent = room;
-                roomList.appendChild(li);
+            rooms.forEach(room => {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.textContent = room; // Display room name in the cell
+                row.appendChild(cell); // Add cell to row
+                roomList.appendChild(row); // Add row to table body
             });
         }
 
-        document.getElementById('add-room-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+        // Function to add a room
+        function addRoom() {
+            const roomName = document.getElementById('room-name').value.trim();
+            if (!roomName) {
+                alert("Please enter a room name.");
+                return; // Exit the function if the field is empty
+            }
 
-            const roomName = document.getElementById('room-name').value;
-
-            // Save to localStorage
             const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
-            rooms.push(roomName);
-            localStorage.setItem('rooms', JSON.stringify(rooms));
+            rooms.push(roomName); // Add new room to the array
+            localStorage.setItem('rooms', JSON.stringify(rooms)); // Save updated room list to local storage
 
-            // Reset the form
-            document.getElementById('add-room-form').reset();
-            loadRooms(); // Refresh the room list
-        });
-
-        // Admin controls logic (assuming admin login is handled)
-        const isAdmin = true; // Set this based on your actual admin login logic
-        if (isAdmin) {
-            document.getElementById('remove-room-controls').style.display = 'block';
-            document.getElementById('remove-room-btn').addEventListener('click', function() {
-                const roomName = prompt("Enter the name of the room to remove:");
-                let rooms = JSON.parse(localStorage.getItem('rooms')) || [];
-
-                rooms = rooms.filter(room => room !== roomName); // Remove room by name
-                localStorage.setItem('rooms', JSON.stringify(rooms)); // Update localStorage
-                loadRooms(); // Reload the list
-                alert("Room removed successfully!");
-            });
+            alert('Room added successfully!');
+            loadRooms(); // Reload rooms to display the updated list
+            document.getElementById('room-name').value = ''; // Clear the input field
         }
 
-        // Load rooms and date/time when the page is ready
+        // Load rooms when the page loads
         window.onload = function() {
-            updateDateTime();
-            loadRooms();
-            setInterval(updateDateTime, 1000); // Update every second
+            loadRooms(); // Load rooms from local storage
         };
     </script>
 </body>
