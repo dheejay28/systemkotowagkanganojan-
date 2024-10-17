@@ -12,7 +12,7 @@
             margin: 0;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 800px;
             margin: auto;
@@ -105,6 +105,14 @@
     </div>
 
     <script>
+        // Function to format time in 12-hour format
+        function formatTimeTo12Hour(timeString) {
+            const [hour, minute] = timeString.split(':').map(Number);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const formattedHour = hour % 12 || 12; // Convert to 12-hour format
+            return `${formattedHour}:${minute < 10 ? '0' + minute : minute} ${period}`;
+        }
+
         function loadReservedRooms() {
             const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
             const reservedRoomsList = document.getElementById('reserved-rooms-list');
@@ -117,8 +125,8 @@
                     <td>${reservation.username}</td>
                     <td>${reservation.course || 'N/A'}</td>
                     <td>${reservation.yearSection || 'N/A'}</td>
-                    <td>${reservation.startTime}</td>
-                    <td>${reservation.endTime}</td>
+                    <td>${formatTimeTo12Hour(reservation.startTime)}</td>
+                    <td>${formatTimeTo12Hour(reservation.endTime)}</td>
                 `;
                 reservedRoomsList.appendChild(row);
             });
