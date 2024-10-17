@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserve Room</title>
+    <link rel="stylesheet" href="rsv.css">
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Reserve a Room</h1>
+        <div class="datetime" id="datetime"></div>
+
+        <label for="room-name">Select Room:</label>
+        <select id="room-name"></select>
+
+        <label for="username">Your Name:</label>
+        <input type="text" id="username" required>
+
+        <label for="course">Course:</label>
+        <input type="text" id="course" required>
+
+        <label for="year-section">Year/Section:</label>
+        <input type="text" id="year-section" required>
+
+        <label for="start-time">Start Time:</label>
+        <input type="time" id="start-time" required>
+
+        <label for="end-time">End Time:</label>
+        <input type="time" id="end-time" required>
+
+        <button onclick="reserveRoom()">Reserve Room</button>
+        <button onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+
+    <script>
+        function loadRooms() {
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            const roomSelect = document.getElementById('room-name');
+            roomSelect.innerHTML = ''; // Clear any existing options
+
+            rooms.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room; // Value for the selected option
+                option.textContent = room; // Display text for the option
+                roomSelect.appendChild(option); // Add option to the select element
+            });
+        }
+
+        function reserveRoom() {
+            const username = document.getElementById('username').value.trim();
+            const course = document.getElementById('course').value.trim();
+            const yearSection = document.getElementById('year-section').value.trim();
+            const roomName = document.getElementById('room-name').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            // Check for empty fields
+            if (!username || !course || !yearSection || !roomName || !startTime || !endTime) {
+                alert("Please fill in all fields.");
+                return; // Exit the function if any field is empty
+            }
+
+            const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+
+            // Check for overlapping reservations
+            const isConflict = reservations.some(reservation => {
+                return (
+                    reservation.roomName === roomName &&
+                    ((startTime >= reservation.startTime && startTime < reservation.endTime) ||
+                    (endTime > reservation.startTime && endTime <= reservation.endTime) ||
+                    (startTime <= reservation.startTime && endTime >= reservation.endTime))
+                );
+            });
+
+            if (isConflict) {
+                alert('The selected room is not available at this time. Please choose a different time.');
+                return; // Exit the function if there is a conflict
+            }
+
+            const reservationCode = generateReservationCode(); // Generate the reservation code
+
+            reservations.push({
+                roomName,
+                username,
+                course,
+                yearSection,
+                startTime, // Store as HH:MM
+                endTime,   // Store as HH:MM
+                reservationCode
+            });
+
+            localStorage.setItem('reservations', JSON.stringify(reservations)); // Save reservations
+            alert('Room reserved successfully! Your reservation code is: ' + reservationCode);
+        }
+
+        function generateReservationCode() {
+            return Math.random().toString(36).substr(2, 9); // Simple random code generator
+        }
+
+        window.onload = function() {
+            loadRooms(); // Load rooms when the page loads
+            const now = new Date();
+            document.getElementById('datetime').textContent = `Current Time: ${now.toLocaleString()}`;
+        };
+    </script>
+</body>
+</html>

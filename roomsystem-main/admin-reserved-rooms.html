@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Reserved Rooms</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Admin - Reserved Rooms</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Room</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Course</th>
+                    <th>Year/Section</th>
+                    <th>Reservation Code</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="admin-reserved-rooms">
+                <!-- Reserved rooms will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function loadAdminReservedRooms() {
+            // Retrieve reserved rooms from localStorage
+            const reservedRooms = JSON.parse(localStorage.getItem('reservedRooms')) || [];
+            const tbody = document.getElementById("admin-reserved-rooms");
+
+            // Clear the table content before populating
+            tbody.innerHTML = '';
+
+            // Loop through the reserved rooms and display each one
+            reservedRooms.forEach(room => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${room.room}</td>
+                    <td>${room.startTime}</td>
+                    <td>${room.endTime}</td>
+                    <td>${room.course}</td>
+                    <td>${room.yearSection}</td>
+                    <td>${room.reservationCode}</td> <!-- Show reservation code for admin -->
+                    <td><button onclick="removeRoom('${room.reservationCode}')">Remove</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function removeRoom(reservationCode) {
+            // Retrieve reserved rooms from localStorage
+            const reservedRooms = JSON.parse(localStorage.getItem('reservedRooms')) || [];
+
+            // Filter out the room with the matching reservation code
+            const updatedRooms = reservedRooms.filter(room => room.reservationCode !== reservationCode);
+
+            // Update the localStorage with the updated list of rooms
+            localStorage.setItem('reservedRooms', JSON.stringify(updatedRooms));
+
+            // Reload the reserved rooms table to reflect the changes
+            loadAdminReservedRooms();
+        }
+
+        // Load reserved rooms when the page is ready
+        window.onload = loadAdminReservedRooms;
+    </script>
+</body>
+</html>
