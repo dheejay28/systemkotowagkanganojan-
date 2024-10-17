@@ -4,33 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Room</title>
-    <link rel="stylesheet" href="rsv.css"> <!-- Link to your CSS -->
-    <style>
-        table {
-            width: 100%; /* Full width for the table */
-            border-collapse: collapse; /* Remove spacing between cells */
-            margin-top: 20px; /* Space above the table */
-        }
-
-        th, td {
-            padding: 10px; /* Padding inside cells */
-            text-align: left; /* Align text to the left */
-            border: 1px solid #ccc; /* Border for table cells */
-        }
-
-        th {
-            background-color: #f2f2f2; /* Light background for header */
-        }
-
-        .remove-button {
-            background-color: red; /* Red background for remove button */
-            color: white; /* White text color */
-            border: none; /* No border */
-            padding: 5px 10px; /* Padding for the button */
-            cursor: pointer; /* Pointer cursor on hover */
-            border-radius: 5px; /* Rounded corners */
-        }
-    </style>
+    <link rel="stylesheet" href="rsv.css">
 </head>
 <body>
     <div class="container">
@@ -39,24 +13,25 @@
 
         <label for="room-name">Room Name:</label>
         <input type="text" id="room-name" required>
+
         <button onclick="addRoom()">Add Room</button>
         <button onclick="window.location.href='index.html'">Back to Home</button>
 
         <h2>Added Rooms</h2>
-        <table id="room-table">
+        <table id="rooms-table" border="1">
             <thead>
                 <tr>
                     <th>Room Name</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="room-table-body">
-                <!-- Added rooms will be populated here -->
-            </tbody>
+            <tbody id="rooms-body"></tbody>
         </table>
     </div>
 
     <script>
+        const scriptURL = "https://script.google.com/macros/s/AKfycby2m7gztzQEymMpbhBRlpC_MN1S9uk5Casf3QGyDTSQhxbviwec63enPcngitHmvAyOgQ/exec";
+
         // Function to add a new room
         function addRoom() {
             const roomName = document.getElementById('room-name').value.trim();
@@ -65,45 +40,48 @@
                 return;
             }
 
-            // Add room to local storage
-            let rooms = JSON.parse(localStorage.getItem('addedRooms')) || [];
-            rooms.push(roomName);
-            localStorage.setItem('addedRooms', JSON.stringify(rooms));
-
-            // Clear input field
-            document.getElementById('room-name').value = '';
-
-            // Refresh the room table
-            loadRooms();
+            // Call the Apps Script to add the room
+            google.script.run.withSuccessHandler(function(response) {
+                if (response.success) {
+                    alert('Room added successfully!');
+                    document.getElementById('room-name').value = ''; // Clear input
+                    loadRooms(); // Reload the table
+                } else {
+                    alert(response.message);
+                }
+            }).addRoom({ roomName: roomName }); // Call addRoom function
         }
 
-        // Function to load and display added rooms
+        // Function to load added rooms into the table
         function loadRooms() {
-            const rooms = JSON.parse(localStorage.getItem('addedRooms')) || [];
-            const roomTableBody = document.getElementById('room-table-body');
-            roomTableBody.innerHTML = ''; // Clear existing rows
+            google.script.run.withSuccessHandler(function(rooms) {
+                const roomsBody = document.getElementById('rooms-body');
+                roomsBody.innerHTML = ''; // Clear previous entries
 
-            rooms.forEach((room, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${room}</td>
-                    <td><button class="remove-button" onclick="removeRoom(${index})">Remove</button></td>
-                `;
-                roomTableBody.appendChild(row); // Add the row to the table
-            });
+                rooms.forEach(room => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${room}</td>
+                                     <td><button onclick="removeRoom('${room}')">Remove</button></td>`;
+                    roomsBody.appendChild(row); // Add row to the table
+                });
+            }).getRooms(); // Call Apps Script function
         }
 
         // Function to remove a room
-        function removeRoom(index) {
-            let rooms = JSON.parse(localStorage.getItem('addedRooms')) || [];
-            rooms.splice(index, 1); // Remove the room at the given index
-            localStorage.setItem('addedRooms', JSON.stringify(rooms)); // Update local storage
-            loadRooms(); // Refresh the room table
+        function removeRoom(roomName) {
+            google.script.run.withSuccessHandler(function(response) {
+                if (response.success) {
+                    alert('Room removed successfully!');
+                    loadRooms(); // Reload the rooms table
+                } else {
+                    alert(response.message);
+                }
+            }).removeRoom({ roomName: roomName }); // Call removeRoom function
         }
 
         // Load rooms when the page loads
         window.onload = function() {
-            loadRooms();
+            loadRooms(); // Load rooms from the database
         };
     </script>
 </body>
